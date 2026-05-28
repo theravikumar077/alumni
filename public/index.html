@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlumniHub - Premium Networking & Mentorship Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden pt-20 pb-16 lg:pt-32 lg:pb-24 flex items-center">
+    <!-- Glowing background accents -->
+    <div class="absolute top-1/4 left-1/10 w-96 h-96 bg-indigo-400/20 dark:bg-violet-600/10 rounded-full blur-3xl -z-10"></div>
+    <div class="absolute bottom-1/4 right-1/10 w-96 h-96 bg-purple-400/20 dark:bg-purple-600/10 rounded-full blur-3xl -z-10"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Content -->
+        <div class="lg:col-span-6 flex flex-col gap-6 text-center lg:text-left">
+          <span class="inline-flex items-center self-center lg:self-start gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 border border-indigo-100 dark:border-violet-900/50">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping"></span>
+            Empowering Academic Connections
+          </span>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-none">
+            Connect. Mentor. <br>
+            <span class="bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent">Succeed Together.</span>
+          </h1>
+          <p class="text-base sm:text-lg text-slate-500 dark:text-slate-400 max-w-xl mx-auto lg:mx-0">
+            Welcome to the next-generation alumni network. Link up with industry experts, find trusted mentors, access exclusive job offers, and foster collaborations across generations.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+            <a href="/signup" class="w-full sm:w-auto px-8 py-4 text-center text-sm font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-2xl transition duration-200 shadow-lg shadow-indigo-200 dark:shadow-none glow-effect">
+              Get Started Now
+            </a>
+            <a href="/alumni" class="w-full sm:w-auto px-8 py-4 text-center text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white/60 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl hover:bg-white dark:hover:bg-slate-900 transition duration-200">
+              Search Alumni Directory
+            </a>
+          </div>
+        </div>
+        <!-- Illustration -->
+        <div class="lg:col-span-6 flex justify-center lg:justify-end animate-float">
+          <div class="relative w-full max-w-lg aspect-[4/3] rounded-3xl overflow-hidden glass shadow-2xl p-3 border border-slate-200/50 dark:border-slate-800/80">
+            <img src="/images/hero-illustration.jpg" alt="Alumni Illustration" class="w-full h-full object-cover rounded-2xl shadow-inner">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trusted Alumni Brands -->
+  <section class="py-10 border-y border-slate-100 dark:border-slate-900/60 bg-slate-50/30 dark:bg-slate-950/20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-xs font-semibold uppercase tracking-wider text-slate-400 mb-6">Our Alumni Work At Industry Giants</p>
+      <div class="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-65 dark:opacity-50">
+        <span class="text-lg font-bold tracking-widest text-slate-500 dark:text-slate-350"><i class="fa-brands fa-google mr-2"></i>GOOGLE</span>
+        <span class="text-lg font-bold tracking-widest text-slate-500 dark:text-slate-350"><i class="fa-brands fa-aws mr-2"></i>AMAZON</span>
+        <span class="text-lg font-bold tracking-widest text-slate-500 dark:text-slate-350"><i class="fa-brands fa-stripe mr-2"></i>STRIPE</span>
+        <span class="text-lg font-bold tracking-widest text-slate-500 dark:text-slate-350"><i class="fa-brands fa-microsoft mr-2"></i>MICROSOFT</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-16 lg:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="text-center p-6 glass-card rounded-3xl">
+          <p class="text-4xl sm:text-5xl font-black text-indigo-600 dark:text-violet-400 mb-2">38+</p>
+          <p class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-400">Alumni Seeded</p>
+        </div>
+        <div class="text-center p-6 glass-card rounded-3xl">
+          <p class="text-4xl sm:text-5xl font-black text-indigo-600 dark:text-violet-400 mb-2">15+</p>
+          <p class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-400">Active Mentors</p>
+        </div>
+        <div class="text-center p-6 glass-card rounded-3xl">
+          <p class="text-4xl sm:text-5xl font-black text-indigo-600 dark:text-violet-400 mb-2">250+</p>
+          <p class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-400">Total Connections</p>
+        </div>
+        <div class="text-center p-6 glass-card rounded-3xl">
+          <p class="text-4xl sm:text-5xl font-black text-indigo-600 dark:text-violet-400 mb-2">100%</p>
+          <p class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-400">MDB Synchronized</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-16 bg-slate-50/50 dark:bg-slate-900/30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16 flex flex-col gap-3">
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Dynamic Features Built For You</h2>
+        <p class="text-base text-slate-500 dark:text-slate-400">Experience a premium, unified portal where database entities interact seamlessly to create real value.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Card 1 -->
+        <div class="p-8 glass-card rounded-3xl flex flex-col gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 flex items-center justify-center text-xl font-bold shadow-sm">
+            <i class="fa-solid fa-user-group"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">Alumni Directory</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Search and filter through all 38 verified alumni records based on batch, industry, location, degree, and mentoring expertise.</p>
+          <a href="/alumni" class="text-sm font-semibold text-indigo-600 dark:text-violet-400 hover:gap-2 flex items-center gap-1.5 transition-all mt-2">
+            Explore Directory <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+        <!-- Card 2 -->
+        <div class="p-8 glass-card rounded-3xl flex flex-col gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 flex items-center justify-center text-xl font-bold shadow-sm">
+            <i class="fa-solid fa-chalkboard-user"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">Mentorship Scheduling</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Students can submit appointment requests directly to verified alumni. Manage acceptances and schedules in your dashboard.</p>
+          <a href="/mentors" class="text-sm font-semibold text-indigo-600 dark:text-violet-400 hover:gap-2 flex items-center gap-1.5 transition-all mt-2">
+            Find a Mentor <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+        <!-- Card 3 -->
+        <div class="p-8 glass-card rounded-3xl flex flex-col gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 flex items-center justify-center text-xl font-bold shadow-sm">
+            <i class="fa-solid fa-briefcase"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">Careers & Internships</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Post career positions, apply directly through the platform, tag salary packages, and get notifications on applications.</p>
+          <a href="/jobs" class="text-sm font-semibold text-indigo-600 dark:text-violet-400 hover:gap-2 flex items-center gap-1.5 transition-all mt-2">
+            Browse Job Board <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Spotlight & Events Preview -->
+  <section class="py-16 lg:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <!-- Events Preview -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl sm:text-3xl font-extrabold">Upcoming Events</h2>
+            <a href="/events" class="text-sm font-semibold text-indigo-600 dark:text-violet-400 hover:underline">View All</a>
+          </div>
+          
+          <div id="events-preview-list" class="flex flex-col gap-4">
+            <!-- Skeleton loaders loaded initially -->
+            <div class="skeleton h-24 rounded-2xl"></div>
+            <div class="skeleton h-24 rounded-2xl"></div>
+          </div>
+        </div>
+
+        <!-- Alumni Spotlight -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+          <h2 class="text-2xl sm:text-3xl font-extrabold">Alumni Spotlight</h2>
+          <div id="spotlight-card" class="glass-card p-8 rounded-3xl flex flex-col gap-6 relative overflow-hidden">
+            <!-- Loading Skeleton -->
+            <div class="skeleton h-60 rounded-2xl"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 lg:py-20 relative overflow-hidden bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-t-[3rem] mt-auto">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.1),transparent)]"></div>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col gap-6 items-center relative z-10">
+      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight">Ready to leverage your community?</h2>
+      <p class="text-base sm:text-lg text-indigo-100 max-w-xl">
+        Sign up in seconds to join verified directories, apply to exclusive internships, or request career mentoring today.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <a href="/signup" class="px-8 py-4 bg-white text-indigo-600 font-semibold rounded-2xl shadow-lg hover:bg-slate-50 transition duration-200 text-center">
+          Join AlumniHub
+        </a>
+        <a href="/login" class="px-8 py-4 bg-indigo-700/50 border border-indigo-400/40 text-white font-semibold rounded-2xl hover:bg-indigo-700 transition duration-200 text-center">
+          Sign In to Account
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer-container"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+  
+  <script>
+    // Custom logic to load preview details dynamically
+    async function pageInit() {
+      loadEventsPreview();
+      loadAlumniSpotlight();
+    }
+
+    async function loadEventsPreview() {
+      try {
+        const res = await fetch("/api/events");
+        const data = await res.json();
+
+        const container = document.getElementById("events-preview-list");
+        if (!container) return;
+
+        if (data.success && data.data.length > 0) {
+          // Take first 2 events
+          const previews = data.data.slice(0, 2);
+          container.innerHTML = previews.map(ev => `
+            <div class="flex items-center gap-4 p-4 rounded-2xl glass-card border border-slate-200/40 dark:border-slate-800/40">
+              <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                <img src="${ev.image}" alt="Event" class="w-full h-full object-cover">
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-slate-800 dark:text-slate-100 truncate">${ev.title}</h4>
+                <p class="text-xs text-indigo-600 dark:text-violet-400 font-medium mt-0.5">
+                  <i class="fa-regular fa-calendar mr-1"></i> ${new Date(ev.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})} &bull; ${ev.time}
+                </p>
+                <p class="text-xs text-slate-400 truncate mt-1">${ev.location}</p>
+              </div>
+              <a href="/events" class="flex-shrink-0 p-2.5 bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 rounded-xl hover:bg-indigo-100 transition">
+                <i class="fa-solid fa-angle-right"></i>
+              </a>
+            </div>
+          `).join("");
+        } else {
+          container.innerHTML = `
+            <div class="p-6 text-center text-sm text-slate-400">
+              No upcoming events at this time.
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error("Error loading events preview:", err);
+      }
+    }
+
+    async function loadAlumniSpotlight() {
+      try {
+        const res = await fetch("/api/alumni");
+        const data = await res.json();
+
+        const container = document.getElementById("spotlight-card");
+        if (!container) return;
+
+        if (data.success && data.data.length > 0) {
+          // Select a random alumni with isMentor = true or high activity
+          const mentors = data.data.filter(a => a.isMentor && a.userId);
+          const spotlight = mentors.length > 0 
+            ? mentors[Math.floor(Math.random() * mentors.length)] 
+            : data.data[0];
+          
+          if (!spotlight.userId) return;
+
+          container.innerHTML = `
+            <div class="flex items-center gap-4 mb-4">
+              <img src="${spotlight.userId.avatar || 'https://via.placeholder.com/60'}" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-indigo-500 object-cover">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <h4 class="font-extrabold text-lg text-slate-800 dark:text-slate-100">${spotlight.userId.name}</h4>
+                  ${spotlight.userId.isVerified ? `<span class="text-sky-500 text-xs" title="Verified"><i class="fa-solid fa-circle-check"></i></span>` : ""}
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400">${spotlight.role} at ${spotlight.company}</p>
+                <p class="text-xs text-indigo-600 dark:text-violet-400 font-semibold mt-0.5">Class of ${spotlight.batch} &bull; ${spotlight.degree}</p>
+              </div>
+            </div>
+            
+            <p class="text-sm text-slate-500 dark:text-slate-400 italic">
+              "${spotlight.userId.bio || 'Contributing to academic growth and giving back to the community.'}"
+            </p>
+
+            <div class="flex flex-wrap gap-2 mt-2">
+              ${spotlight.tags.map(tag => `<span class="px-2.5 py-1 rounded-lg text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-350">#${tag}</span>`).join("")}
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-400"><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Activity Score: ${spotlight.activity}%</span>
+              <a href="/profile?id=${spotlight.userId._id}" class="text-xs font-bold text-indigo-600 dark:text-violet-400 flex items-center gap-1 hover:underline">
+                View Spotlight Profile <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </a>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error("Error loading spotlight:", err);
+      }
+    }
+  </script>
+
+</body>
+</html>

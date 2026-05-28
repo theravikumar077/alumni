@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentors Directory - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Main Directory Layout -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div class="flex flex-col gap-6">
+      <div>
+        <h1 class="text-3xl font-black">Mentor Directory</h1>
+        <p class="text-xs text-slate-400 mt-1">Book one-on-one sessions with industry veterans for career coaching and guidance.</p>
+      </div>
+
+      <!-- Search and Filter Panel -->
+      <div class="glass p-6 rounded-3xl border border-slate-200/50 dark:border-slate-800/80 flex flex-col md:flex-row gap-4">
+        <!-- Search -->
+        <div class="flex-1 relative">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+          <input type="text" id="mentor-search-input" oninput="debounceFetch()" class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Search by mentor name, expertise keyword...">
+        </div>
+        <!-- Expertise tag filter -->
+        <div class="w-full md:w-72 relative">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-tags"></i></span>
+          <input type="text" id="expertise-input" oninput="debounceFetch()" class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Filter by expertise (e.g. tech, ux)...">
+        </div>
+      </div>
+
+      <!-- Mentors List Grid -->
+      <div id="mentors-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Skeleton loaders -->
+      </div>
+      
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-20 flex flex-col items-center gap-4">
+        <span class="p-5 bg-indigo-50 dark:bg-slate-900 text-slate-400 rounded-full text-4xl"><i class="fa-solid fa-graduation-cap"></i></span>
+        <h3 class="text-xl font-bold">No Mentors Found</h3>
+        <p class="text-xs text-slate-400 max-w-sm">Try searching for other tags like #tech, #business, #design, or search by different names.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scheduling Modal -->
+  <div id="booking-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm hidden">
+    <div class="max-w-md w-full rounded-3xl glass p-6 border border-slate-200/50 dark:border-slate-800/80 shadow-2xl relative animate-float">
+      <!-- Close button -->
+      <button onclick="closeBookingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="text-xl font-extrabold mb-4 text-slate-800 dark:text-slate-100 flex items-center gap-2">
+        <i class="fa-regular fa-calendar-check text-indigo-500"></i> Book Mentorship Session
+      </h3>
+      <p id="booking-mentor-name" class="text-sm text-indigo-600 dark:text-violet-400 font-semibold mb-4"></p>
+
+      <form id="booking-form" onsubmit="submitBooking(event)" class="flex flex-col gap-4">
+        <input type="hidden" id="booking-mentor-id">
+        
+        <div>
+          <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Select Date</label>
+          <input type="date" id="booking-date" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Select Time slot</label>
+          <input type="text" id="booking-time" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="e.g. 10:00 AM or 4:00 PM">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Session Topic / Goal</label>
+          <textarea id="booking-topic" rows="3" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Describe what you want to talk about (e.g. portfolio review, tech stack recommendations)..."></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 text-sm font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-xl transition duration-200 shadow-md">
+          Request Session
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer id="footer-container" class="mt-auto"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    let debounceTimer;
+
+    function pageInit() {
+      fetchMentors();
+      
+      // Set min date to today for scheduler
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('booking-date').setAttribute('min', today);
+    }
+
+    function debounceFetch() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        fetchMentors();
+      }, 300);
+    }
+
+    async function fetchMentors() {
+      const grid = document.getElementById("mentors-grid");
+      const emptyState = document.getElementById("empty-state");
+      
+      grid.innerHTML = createSkeleton(6);
+      emptyState.classList.add("hidden");
+
+      const search = document.getElementById("mentor-search-input").value;
+      const expertise = document.getElementById("expertise-input").value;
+
+      let queryParams = new URLSearchParams();
+      if (search) queryParams.append("search", search);
+      if (expertise) queryParams.append("expertise", expertise);
+
+      try {
+        const res = await fetch(`/api/mentors?${queryParams.toString()}`);
+        const data = await res.json();
+
+        if (data.success && data.data.length > 0) {
+          grid.innerHTML = data.data.map(mentor => {
+            if (!mentor.userId) return "";
+
+            const expertiseHTML = mentor.expertise.map(exp => `
+              <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400">#${exp}</span>
+            `).join("");
+
+            return `
+              <div class="glass-card p-6 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 flex flex-col justify-between h-80">
+                <div>
+                  <div class="flex items-center gap-4">
+                    <img src="${mentor.userId.avatar || 'https://via.placeholder.com/48'}" alt="Avatar" class="w-12 h-12 rounded-full border-2 border-emerald-500 object-cover flex-shrink-0">
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-1">
+                        <h3 class="font-extrabold text-base text-slate-800 dark:text-slate-100 truncate">${mentor.userId.name}</h3>
+                        ${mentor.userId.isVerified ? `<span class="text-sky-500 text-xs" title="Verified"><i class="fa-solid fa-circle-check"></i></span>` : ""}
+                      </div>
+                      <p class="text-xs text-slate-500 dark:text-slate-400 truncate">${mentor.alumniId ? mentor.alumniId.role : "Mentor"} at ${mentor.alumniId ? mentor.alumniId.company : "AlumniHub"}</p>
+                    </div>
+                  </div>
+                  
+                  <p class="text-xs font-semibold text-indigo-600 dark:text-violet-400 mt-3">
+                    Expertise:
+                  </p>
+                  <div class="flex flex-wrap gap-1.5 mt-1.5">
+                    ${expertiseHTML}
+                  </div>
+
+                  <p class="text-xs text-slate-450 dark:text-slate-400 mt-3 line-clamp-2 italic">
+                    "${mentor.userId.bio || 'Available for technical deep-dives and career roadmap review.'}"
+                  </p>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-850 flex flex-col gap-3">
+                  <div class="flex justify-between items-center text-[10px] text-slate-400 font-semibold">
+                    <span><i class="fa-regular fa-clock mr-1"></i> Availability: ${mentor.availability}</span>
+                    <span><i class="fa-solid fa-star text-amber-400 mr-0.5"></i> ${mentor.rating.toFixed(1)}</span>
+                  </div>
+
+                  <div class="flex gap-2">
+                    <a href="/messages?chat=${mentor.userId._id}" class="flex-1 text-center py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-850 transition">
+                      <i class="fa-solid fa-comments mr-1"></i> Message
+                    </a>
+                    <button onclick="openBookingModal('${mentor._id}', '${mentor.userId.name}', '${mentor.availability}')" class="flex-1 py-2 text-xs font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-xl transition shadow-sm">
+                      <i class="fa-regular fa-calendar mr-1"></i> Book Session
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+        } else {
+          grid.innerHTML = "";
+          emptyState.classList.remove("hidden");
+        }
+      } catch (err) {
+        console.error("Fetch mentors error:", err);
+        grid.innerHTML = "";
+        showToast("Error retrieving mentors list", "error");
+      }
+    }
+
+    function openBookingModal(mentorId, name, availability) {
+      if (!currentUser) {
+        showToast("Please log in to book a session", "warning");
+        return;
+      }
+      document.getElementById("booking-mentor-id").value = mentorId;
+      document.getElementById("booking-mentor-name").innerText = `Mentor: ${name} (Availability: ${availability})`;
+      document.getElementById("booking-modal").classList.remove("hidden");
+    }
+
+    function closeBookingModal() {
+      document.getElementById("booking-modal").classList.add("hidden");
+      document.getElementById("booking-form").reset();
+    }
+
+    async function submitBooking(e) {
+      e.preventDefault();
+      
+      const mentorId = document.getElementById("booking-mentor-id").value;
+      const date = document.getElementById("booking-date").value;
+      const time = document.getElementById("booking-time").value;
+      const topic = document.getElementById("booking-topic").value;
+
+      try {
+        const res = await fetch(`/api/mentors/request/${mentorId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ date, time, topic })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showToast(data.message, "success");
+          closeBookingModal();
+        } else {
+          showToast(data.message || "Failed to book session", "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+  </script>
+</body>
+</html>

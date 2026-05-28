@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col justify-between">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Signup Form Wrapper -->
+  <main class="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
+
+    <div class="max-w-xl w-full p-8 rounded-3xl glass shadow-2xl border border-slate-200/50 dark:border-slate-800/80 relative z-10 flex flex-col gap-6">
+      <div class="text-center">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100">Create Account</h2>
+        <p class="text-xs text-slate-400 mt-2">Join our dynamic networking and mentoring ecosystem today.</p>
+      </div>
+
+      <form id="signup-form" onsubmit="handleSignupSubmit(event)" class="flex flex-col gap-4">
+        <!-- Basic User Details -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Full Name</label>
+            <input type="text" id="signup-name" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="John Doe">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Email Address</label>
+            <input type="email" id="signup-email" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="john@example.com">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Password</label>
+            <input type="password" id="signup-password" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="••••••••">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Select Role Type</label>
+            <select id="signup-role" onchange="toggleAlumniFields()" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+              <option value="user">Student / User</option>
+              <option value="alumni">Alumni</option>
+              <option value="mentor">Mentor (Alumni)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Conditional Alumni Details Fields -->
+        <div id="alumni-details-fields" class="hidden flex flex-col gap-4 border-t border-slate-100 dark:border-slate-800/80 pt-4 mt-1">
+          <p class="text-xs font-bold text-indigo-600 dark:text-violet-400 uppercase tracking-wider mb-1"><i class="fa-solid fa-graduation-cap mr-1"></i> Academic & Professional Details</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Graduation Batch</label>
+              <input type="number" id="signup-batch" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="2018" value="2020">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Degree Completed</label>
+              <input type="text" id="signup-degree" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="BSc Computer Science">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Current Company</label>
+              <input type="text" id="signup-company" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Tech Corp">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Job Title</label>
+              <input type="text" id="signup-role-title" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Software Engineer">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Industry Segment</label>
+              <input type="text" id="signup-industry" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Technology">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Expertise Tags (comma separated)</label>
+              <input type="text" id="signup-tags" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="tech, coding, node">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 text-sm font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-xl transition duration-200 shadow-md shadow-indigo-150 dark:shadow-none glow-effect mt-2">
+          Create Account
+        </button>
+      </form>
+
+      <div class="text-center mt-2">
+        <p class="text-xs text-slate-400">Already have an account? <a href="/login" class="text-indigo-600 dark:text-violet-400 font-semibold hover:underline">Log in here</a></p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    function toggleAlumniFields() {
+      const role = document.getElementById("signup-role").value;
+      const fields = document.getElementById("alumni-details-fields");
+      if (role === "alumni" || role === "mentor") {
+        fields.classList.remove("hidden");
+      } else {
+        fields.classList.add("hidden");
+      }
+    }
+
+    async function handleSignupSubmit(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("signup-name").value;
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      const role = document.getElementById("signup-role").value;
+
+      const signupData = { name, email, password, role };
+
+      if (role === "alumni" || role === "mentor") {
+        signupData.batch = document.getElementById("signup-batch").value;
+        signupData.degree = document.getElementById("signup-degree").value;
+        signupData.company = document.getElementById("signup-company").value;
+        signupData.roleTitle = document.getElementById("signup-role-title").value;
+        signupData.industry = document.getElementById("signup-industry").value;
+        signupData.tags = document.getElementById("signup-tags").value;
+      }
+
+      try {
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(signupData)
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          showToast("Account created successfully! Welcome to AlumniHub.", "success");
+          
+          localStorage.setItem("authToken", data.token);
+
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1000);
+        } else {
+          showToast(data.message || "Registration failed", "error");
+        }
+      } catch (err) {
+        showToast("Error connecting to server during registration", "error");
+      }
+    }
+  </script>
+</body>
+</html>

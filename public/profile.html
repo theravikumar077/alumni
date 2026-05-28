@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Profile Space -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div id="profile-content" class="flex flex-col gap-8">
+      <!-- Loading Skeleton -->
+      <div class="skeleton h-80 rounded-3xl"></div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm hidden">
+      <div class="max-w-xl w-full rounded-3xl glass p-6 border border-slate-200/50 dark:border-slate-800/80 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <!-- Close button -->
+        <button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+
+        <h3 class="text-xl font-extrabold mb-4 text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <i class="fa-regular fa-pen-to-square text-indigo-500"></i> Edit Profile Information
+        </h3>
+
+        <form id="edit-form" onsubmit="submitProfileEdit(event)" class="flex flex-col gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Full Name</label>
+              <input type="text" id="edit-name" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Location</label>
+              <input type="text" id="edit-location" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">LinkedIn Profile Link</label>
+              <input type="text" id="edit-linkedin" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Skills (comma split)</label>
+              <input type="text" id="edit-skills" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Short Bio</label>
+            <textarea id="edit-bio" rows="2" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200"></textarea>
+          </div>
+
+          <!-- Alumni Subfields -->
+          <div id="edit-alumni-subfields" class="hidden flex flex-col gap-4 border-t border-slate-100 dark:border-slate-800/80 pt-4">
+            <p class="text-xs font-bold text-indigo-600 dark:text-violet-400 uppercase tracking-wider"><i class="fa-solid fa-graduation-cap mr-1"></i> Alumni Specifics</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Graduation Batch</label>
+                <input type="number" id="edit-batch" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Degree</label>
+                <input type="text" id="edit-degree" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Current Company</label>
+                <input type="text" id="edit-company" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Job Title</label>
+                <input type="text" id="edit-role" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Industry Segment</label>
+              <input type="text" id="edit-industry" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-100 dark:border-slate-800/80 pt-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Avatar Image URL</label>
+              <input type="text" id="edit-avatar" class="w-full px-3 py-2 rounded-lg glass-input text-xs">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Cover Banner URL</label>
+              <input type="text" id="edit-cover" class="w-full px-3 py-2 rounded-lg glass-input text-xs">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 text-sm font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-xl transition duration-200 shadow-md">
+            Save Profile Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container"></footer
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    let viewedUserId = null;
+    let viewedUser = null;
+    let viewedAlumni = null;
+
+    function pageInit() {
+      const urlParams = new URLSearchParams(window.location.search);
+      viewedUserId = urlParams.get("id") || (currentUser ? currentUser.id || currentUser._id : null);
+      
+      if (!viewedUserId) {
+        window.location.href = "/login";
+        return;
+      }
+
+      fetchProfile();
+    }
+
+    async function fetchProfile() {
+      const content = document.getElementById("profile-content");
+      
+      try {
+        const res = await fetch(`/api/alumni/${viewedUserId}`);
+        const data = await res.json();
+
+        if (data.success) {
+          viewedUser = data.user;
+          viewedAlumni = data.alumni;
+
+          const isOwner = currentUser && (currentUser.id === viewedUser._id || currentUser._id === viewedUser._id);
+          const skillsHTML = viewedUser.skills.map(s => `
+            <span class="px-3 py-1 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-350">#${s}</span>
+          `).join("");
+
+          // Alumni specific details section
+          let alumniFieldsHTML = "";
+          if (viewedAlumni) {
+            alumniFieldsHTML = `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-150/40 dark:border-slate-850">
+                <div>
+                  <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Academic Background</h3>
+                  <p class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-2">${viewedAlumni.degree}</p>
+                  <p class="text-xs text-indigo-600 dark:text-violet-400 font-semibold mt-1">Class of ${viewedAlumni.batch}</p>
+                </div>
+                <div>
+                  <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Current Position</h3>
+                  <p class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-2">${viewedAlumni.role}</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">at ${viewedAlumni.company} (${viewedAlumni.industry})</p>
+                </div>
+              </div>
+            `;
+          }
+
+          content.innerHTML = `
+            <!-- Cover & Avatar -->
+            <div class="relative rounded-3xl overflow-hidden glass shadow-xl border border-slate-200/50 dark:border-slate-800/80">
+              <div class="h-48 md:h-64 overflow-hidden bg-slate-200">
+                <img src="${viewedUser.coverImage || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800'}" alt="Cover Image" class="w-full h-full object-cover">
+              </div>
+              
+              <!-- Avatar positioning -->
+              <div class="px-6 pb-6 relative flex flex-col md:flex-row md:items-end justify-between gap-6 -mt-16 md:-mt-20">
+                <div class="flex flex-col md:flex-row items-start md:items-end gap-4 text-left">
+                  <img src="${viewedUser.avatar}" alt="Avatar" class="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-slate-50 dark:border-slate-950 object-cover shadow-lg">
+                  <div class="mb-2">
+                    <div class="flex items-center gap-2">
+                      <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 leading-tight">${viewedUser.name}</h2>
+                      ${viewedUser.isVerified ? `<span class="text-sky-500 text-lg" title="Verified"><i class="fa-solid fa-circle-check"></i></span>` : ""}
+                      ${viewedUser.role === 'mentor' ? `<span class="text-emerald-500 text-sm font-bold bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-lg border border-emerald-550/20">Mentor</span>` : ""}
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-location-dot text-slate-400"></i> ${viewedUser.location || "Earth"}</p>
+                  </div>
+                </div>
+
+                <div class="flex gap-3 mb-2">
+                  ${isOwner 
+                    ? `<button onclick="openEditModal()" class="px-5 py-2.5 text-xs font-semibold text-indigo-650 bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 hover:bg-indigo-100 rounded-xl transition border border-indigo-200/25">Edit Profile</button>`
+                    : `<a href="/messages?chat=${viewedUser._id}" class="px-5 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-850 transition"><i class="fa-solid fa-comments mr-1"></i> Message</a>
+                       <button onclick="handleConnectAction('${viewedUser._id}')" class="px-5 py-2.5 text-xs font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-xl transition shadow-sm">Connect</button>`
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Details Columns -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <!-- Left side -->
+              <div class="lg:col-span-8 flex flex-col gap-6">
+                <!-- Bio -->
+                <div class="glass-card p-8 rounded-3xl">
+                  <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">About Me</h3>
+                  <p class="text-sm text-slate-600 dark:text-slate-355 leading-relaxed whitespace-pre-wrap">${viewedUser.bio || "No biography provided yet."}</p>
+                </div>
+
+                <!-- Alumni Details (if any) -->
+                ${alumniFieldsHTML}
+
+                <!-- Activity Timeline -->
+                <div class="glass-card p-8 rounded-3xl">
+                  <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6">Activity Timeline</h3>
+                  <div class="relative border-l-2 border-slate-100 dark:border-slate-800 pl-6 ml-3 flex flex-col gap-6 text-sm">
+                    <div class="relative">
+                      <span class="absolute -left-[31px] top-0.5 p-1 bg-indigo-600 rounded-full text-[8px] text-white w-5 h-5 flex items-center justify-center border-4 border-slate-50 dark:border-slate-950"><i class="fa-solid fa-user-plus"></i></span>
+                      <p class="font-bold text-slate-800 dark:text-slate-100">Joined AlumniHub</p>
+                      <p class="text-[10px] text-slate-400 mt-0.5">${new Date(viewedUser.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right side -->
+              <div class="lg:col-span-4 flex flex-col gap-6">
+                <!-- Skills Panel -->
+                <div class="glass-card p-8 rounded-3xl">
+                  <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Core Skills</h3>
+                  <div class="flex flex-wrap gap-2">
+                    ${skillsHTML || `<p class="text-xs text-slate-400 italic">No skills listed yet.</p>`}
+                  </div>
+                </div>
+
+                <!-- Contact & Links -->
+                <div class="glass-card p-8 rounded-3xl flex flex-col gap-4 text-xs font-semibold">
+                  <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Details</h3>
+                  
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-400">Email:</span>
+                    <span class="text-slate-700 dark:text-slate-200">${viewedUser.email}</span>
+                  </div>
+                  ${viewedUser.linkedin ? `
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-400">LinkedIn:</span>
+                      <a href="${viewedUser.linkedin}" target="_blank" class="text-indigo-650 dark:text-violet-400 hover:underline truncate max-w-[150px]">${viewedUser.linkedin}</a>
+                    </div>
+                  ` : ""}
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-400">Verified status:</span>
+                    <span>${viewedUser.isVerified ? `<span class="text-emerald-500 font-bold">Verified</span>` : `<span class="text-amber-500 font-bold">Pending</span>`}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error("Fetch profile details error:", err);
+        content.innerHTML = `<div class="p-8 text-center text-rose-500">Error loading profile details. Please try again.</div>`;
+      }
+    }
+
+    async function handleConnectAction(userId) {
+      if (!currentUser) {
+        showToast("Please log in to connect", "warning");
+        return;
+      }
+      try {
+        const res = await fetch(`/api/alumni/connect/${userId}`, {
+          method: "POST"
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, "success");
+          fetchProfile(); // refresh page
+        } else {
+          showToast(data.message, "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+
+    function openEditModal() {
+      if (!viewedUser) return;
+      
+      document.getElementById("edit-name").value = viewedUser.name;
+      document.getElementById("edit-location").value = viewedUser.location || "";
+      document.getElementById("edit-linkedin").value = viewedUser.linkedin || "";
+      document.getElementById("edit-skills").value = viewedUser.skills.join(", ");
+      document.getElementById("edit-bio").value = viewedUser.bio || "";
+      document.getElementById("edit-avatar").value = viewedUser.avatar || "";
+      document.getElementById("edit-cover").value = viewedUser.coverImage || "";
+
+      const subfields = document.getElementById("edit-alumni-subfields");
+      if (viewedAlumni) {
+        subfields.classList.remove("hidden");
+        document.getElementById("edit-batch").value = viewedAlumni.batch;
+        document.getElementById("edit-degree").value = viewedAlumni.degree;
+        document.getElementById("edit-company").value = viewedAlumni.company;
+        document.getElementById("edit-role").value = viewedAlumni.role;
+        document.getElementById("edit-industry").value = viewedAlumni.industry;
+      } else {
+        subfields.classList.add("hidden");
+      }
+
+      document.getElementById("edit-modal").classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      document.getElementById("edit-modal").classList.add("hidden");
+      document.getElementById("edit-form").reset();
+    }
+
+    async function submitProfileEdit(e) {
+      e.preventDefault();
+
+      const editData = {
+        name: document.getElementById("edit-name").value,
+        location: document.getElementById("edit-location").value,
+        linkedin: document.getElementById("edit-linkedin").value,
+        skills: document.getElementById("edit-skills").value,
+        bio: document.getElementById("edit-bio").value,
+        avatar: document.getElementById("edit-avatar").value,
+        coverImage: document.getElementById("edit-cover").value
+      };
+
+      if (viewedAlumni) {
+        editData.batch = document.getElementById("edit-batch").value;
+        editData.degree = document.getElementById("edit-degree").value;
+        editData.company = document.getElementById("edit-company").value;
+        editData.role = document.getElementById("edit-role").value;
+        editData.industry = document.getElementById("edit-industry").value;
+      }
+
+      try {
+        const res = await fetch("/api/alumni/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(editData)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showToast("Profile updated successfully!", "success");
+          closeEditModal();
+          // Update global session cache for header rendering
+          currentUser.name = data.user.name;
+          currentUser.avatar = data.user.avatar;
+          renderNavbar();
+          
+          fetchProfile(); // reload UI
+        } else {
+          showToast(data.message || "Failed to update profile", "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumni Directory - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Main Directory Layout -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div class="flex flex-col gap-6">
+      <div>
+        <h1 class="text-3xl font-black">Alumni Directory</h1>
+        <p class="text-xs text-slate-400 mt-1">Connect with graduates, build professional links, and grow your networking sphere.</p>
+      </div>
+
+      <!-- Search and Filter Panel -->
+      <div class="glass p-6 rounded-3xl border border-slate-200/50 dark:border-slate-800/80 flex flex-col gap-4">
+        <!-- Search, Location, and Sort Row -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <!-- Search -->
+          <div class="md:col-span-5 relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" id="search-input" oninput="debounceFetch()" class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Search by name, role, company, tag...">
+          </div>
+          <!-- Location -->
+          <div class="md:col-span-4 relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-location-dot"></i></span>
+            <input type="text" id="location-input" oninput="debounceFetch()" class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Filter by location...">
+          </div>
+          <!-- Sort -->
+          <div class="md:col-span-3 relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-arrow-down-wide-narrow"></i></span>
+            <select id="sort-select" onchange="fetchAlumni()" class="w-full pl-10 pr-4 py-3 rounded-2xl glass-input text-sm text-slate-800 dark:text-slate-200 appearance-none">
+              <option value="activity">Sort by Activity</option>
+              <option value="connections">Sort by Connections</option>
+              <option value="batch_desc">Batch: Newest First</option>
+              <option value="batch_asc">Batch: Oldest First</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Filters Row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Batch Year</label>
+            <input type="number" id="batch-input" oninput="debounceFetch()" class="w-full px-3 py-2 rounded-xl glass-input text-xs" placeholder="e.g. 2012">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Industry</label>
+            <input type="text" id="industry-input" oninput="debounceFetch()" class="w-full px-3 py-2 rounded-xl glass-input text-xs" placeholder="e.g. Technology">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Degree</label>
+            <input type="text" id="degree-input" oninput="debounceFetch()" class="w-full px-3 py-2 rounded-xl glass-input text-xs" placeholder="e.g. MBA">
+          </div>
+          <div class="flex items-end pb-1.5">
+            <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-600 dark:text-slate-350">
+              <input type="checkbox" id="mentor-checkbox" onchange="fetchAlumni()" class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500">
+              Mentor Available Only
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alumni List Grid -->
+      <div id="alumni-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Skeleton loaders -->
+      </div>
+      
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-20 flex flex-col items-center gap-4">
+        <span class="p-5 bg-indigo-50 dark:bg-slate-900 text-slate-400 rounded-full text-4xl"><i class="fa-solid fa-users-slash"></i></span>
+        <h3 class="text-xl font-bold">No Alumni Found</h3>
+        <p class="text-xs text-slate-400 max-w-sm">Try broadening your search keywords or loosening up the industry and batch filters.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container" class="mt-auto"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    let debounceTimer;
+
+    function pageInit() {
+      fetchAlumni();
+    }
+
+    function debounceFetch() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        fetchAlumni();
+      }, 300);
+    }
+
+    async function fetchAlumni() {
+      const grid = document.getElementById("alumni-grid");
+      const emptyState = document.getElementById("empty-state");
+      
+      // Inject Skeleton Loader
+      grid.innerHTML = createSkeleton(6);
+      emptyState.classList.add("hidden");
+
+      // Build Query String
+      const search = document.getElementById("search-input").value;
+      const location = document.getElementById("location-input").value;
+      const sort = document.getElementById("sort-select").value;
+      const batch = document.getElementById("batch-input").value;
+      const industry = document.getElementById("industry-input").value;
+      const degree = document.getElementById("degree-input").value;
+      const isMentor = document.getElementById("mentor-checkbox").checked;
+
+      let queryParams = new URLSearchParams();
+      if (search) queryParams.append("search", search);
+      if (location) queryParams.append("location", location);
+      if (sort) queryParams.append("sort", sort);
+      if (batch) queryParams.append("batch", batch);
+      if (industry) queryParams.append("industry", industry);
+      if (degree) queryParams.append("degree", degree);
+      if (isMentor) queryParams.append("isMentor", "true");
+
+      try {
+        const res = await fetch(`/api/alumni?${queryParams.toString()}`);
+        const data = await res.json();
+
+        if (data.success && data.data.length > 0) {
+          grid.innerHTML = data.data.map(alumni => {
+            if (!alumni.userId) return "";
+            
+            const tagsHTML = alumni.tags.map(tag => `
+              <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">#${tag}</span>
+            `).join("");
+
+            return `
+              <div class="glass-card p-6 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 flex flex-col justify-between h-72">
+                <div>
+                  <div class="flex items-center gap-4">
+                    <img src="${alumni.userId.avatar || 'https://via.placeholder.com/48'}" alt="Avatar" class="w-12 h-12 rounded-full border-2 border-indigo-500 object-cover flex-shrink-0">
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-1.5">
+                        <h3 class="font-extrabold text-base text-slate-800 dark:text-slate-100 truncate">${alumni.userId.name}</h3>
+                        ${alumni.userId.isVerified ? `<span class="text-sky-500 text-xs" title="Verified"><i class="fa-solid fa-circle-check"></i></span>` : ""}
+                        ${alumni.isMentor ? `<span class="text-emerald-500 text-xs" title="Mentor Available"><i class="fa-solid fa-graduation-cap"></i></span>` : ""}
+                      </div>
+                      <p class="text-xs text-slate-500 dark:text-slate-400 truncate">${alumni.role} at ${alumni.company}</p>
+                    </div>
+                  </div>
+                  
+                  <p class="text-xs text-indigo-600 dark:text-violet-400 font-semibold mt-3">
+                    Class of ${alumni.batch} &bull; ${alumni.degree}
+                  </p>
+                  
+                  <p class="text-xs text-slate-450 dark:text-slate-400 mt-2 line-clamp-2 italic">
+                    "${alumni.userId.bio || 'Passionate professional connected to AlumniHub.'}"
+                  </p>
+
+                  <div class="flex flex-wrap gap-1.5 mt-3">
+                    ${tagsHTML}
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-slate-850">
+                  <div class="flex items-center gap-3">
+                    <span class="text-[10px] text-slate-400 font-semibold"><i class="fa-solid fa-user-group text-slate-400 mr-1"></i> ${alumni.connections} links</span>
+                    <span class="text-[10px] text-slate-400 font-semibold"><i class="fa-solid fa-bolt text-amber-500 mr-0.5"></i> ${alumni.activity}%</span>
+                  </div>
+
+                  <div class="flex gap-2">
+                    ${alumni.userId.linkedin ? `
+                      <a href="${alumni.userId.linkedin}" target="_blank" class="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-violet-400 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-850 transition">
+                        <i class="fa-brands fa-linkedin text-sm"></i>
+                      </a>
+                    ` : ""}
+                    <button onclick="handleConnect('${alumni.userId._id}')" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-xl transition shadow-sm">
+                      Connect
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+        } else {
+          grid.innerHTML = "";
+          emptyState.classList.remove("hidden");
+        }
+      } catch (err) {
+        console.error("Fetch alumni directory error:", err);
+        grid.innerHTML = "";
+        showToast("Error retrieving alumni directory data", "error");
+      }
+    }
+
+    async function handleConnect(userId) {
+      if (!currentUser) {
+        showToast("Please log in to connect with alumni", "warning");
+        return;
+      }
+      try {
+        const res = await fetch(`/api/alumni/connect/${userId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, "success");
+          fetchAlumni(); // refresh connection counts
+        } else {
+          showToast(data.message || "Failed to send connection request", "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+  </script>
+</body>
+</html>

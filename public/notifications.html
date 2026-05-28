@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Main Alerts Area -->
+  <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-10">
+    <div class="flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-black">Notifications</h1>
+          <p class="text-xs text-slate-400 mt-1">Keep track of mentoring schedules, RSVPs, and direct messages.</p>
+        </div>
+        
+        <button onclick="clearNotifications()" class="px-4 py-2.5 text-xs font-semibold text-indigo-650 bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 rounded-xl hover:bg-indigo-100 transition border border-indigo-200/25">
+          Mark All Read
+        </button>
+      </div>
+
+      <!-- Notifications Stream -->
+      <div id="notifications-list" class="flex flex-col gap-3">
+        <!-- Skeleton loaders -->
+        <div class="skeleton h-16 rounded-2xl"></div>
+        <div class="skeleton h-16 rounded-2xl"></div>
+      </div>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="hidden text-center py-20 flex flex-col items-center gap-4">
+        <span class="p-5 bg-indigo-50 dark:bg-slate-900 text-slate-450 rounded-full text-4xl"><i class="fa-regular fa-bell-slash"></i></span>
+        <h3 class="text-xl font-bold">All caught up!</h3>
+        <p class="text-xs text-slate-400">You have no new notifications at this time.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container" class="mt-auto"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    function pageInit() {
+      fetchNotifications();
+    }
+
+    async function fetchNotifications() {
+      const container = document.getElementById("notifications-list");
+      const emptyState = document.getElementById("empty-state");
+
+      try {
+        const res = await fetch("/api/notifications");
+        const data = await res.json();
+
+        if (data.success && data.data.length > 0) {
+          emptyState.classList.add("hidden");
+          container.innerHTML = data.data.map(notif => {
+            let icon = "";
+            let color = "";
+            
+            if (notif.type === "message") {
+              icon = '<i class="fa-regular fa-comment-dots"></i>';
+              color = "text-indigo-600 bg-indigo-50 dark:bg-violet-950/40 dark:text-violet-400";
+            } else if (notif.type === "mentor_request") {
+              icon = '<i class="fa-regular fa-calendar-check"></i>';
+              color = "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-450";
+            } else if (notif.type === "rsvp") {
+              icon = '<i class="fa-solid fa-user-check"></i>';
+              color = "text-indigo-600 bg-indigo-50 dark:bg-violet-950/40 dark:text-violet-400";
+            } else if (notif.type === "job_apply") {
+              icon = '<i class="fa-solid fa-briefcase"></i>';
+              color = "text-amber-600 bg-amber-50 dark:bg-amber-950/20 dark:text-amber-450";
+            } else {
+              icon = '<i class="fa-regular fa-bell"></i>';
+              color = "text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-300";
+            }
+
+            const unreadClass = !notif.isRead 
+              ? "border-l-4 border-l-indigo-600 bg-indigo-50/20 dark:bg-violet-950/10 font-medium" 
+              : "border-l-4 border-l-transparent";
+
+            return `
+              <a href="${notif.link || 'javascript:void(0)'}" class="flex items-center gap-4 p-4 rounded-2xl glass-card border border-slate-200/40 dark:border-slate-800/40 ${unreadClass}">
+                <div class="p-2.5 rounded-xl text-lg flex-shrink-0 ${color}">
+                  ${icon}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">${notif.title}</h4>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${notif.content}</p>
+                </div>
+                <span class="text-[10px] text-slate-400 flex-shrink-0">${new Date(notif.createdAt).toLocaleDateString()}</span>
+              </a>
+            `;
+          }).join("");
+        } else {
+          container.innerHTML = "";
+          emptyState.classList.remove("hidden");
+        }
+      } catch (err) {
+        console.error("Fetch notifications error:", err);
+        container.innerHTML = "";
+        showToast("Error retrieving alerts logs", "error");
+      }
+    }
+
+    async function clearNotifications() {
+      try {
+        const res = await fetch("/api/notifications/read", {
+          method: "POST"
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast("All marked as read!", "success");
+          fetchNotifications();
+          updateNotificationCounts(); // navbar update
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Main Settings Workspace -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-10">
+    <div class="flex flex-col gap-6">
+      <div>
+        <h1 class="text-3xl font-black">Account Settings</h1>
+        <p class="text-xs text-slate-400 mt-1">Configure your personal preferences, theme aesthetics, and login credentials.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        <!-- Sidebar Navigation (Settings Tabs) -->
+        <aside class="md:col-span-4 flex flex-col gap-1">
+          <button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 border border-indigo-200/20 font-bold text-sm">
+            <i class="fa-solid fa-sliders"></i> Preferences
+          </button>
+          <button onclick="showToast('Security logs are read-only.', 'info')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-slate-100/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-350 text-sm font-semibold transition">
+            <i class="fa-solid fa-shield-halved"></i> Security & Password
+          </button>
+        </aside>
+
+        <!-- Configuration Panel -->
+        <section class="md:col-span-8 flex flex-col gap-6">
+          <!-- Dark Mode preferences -->
+          <div class="glass-card p-6 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 flex flex-col gap-4">
+            <h3 class="text-sm font-extrabold text-slate-400 uppercase tracking-wider">Aesthetic Theme</h3>
+            
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-100">Toggle Dark Mode</p>
+                <p class="text-xs text-slate-400">Switch between light and dark backgrounds for optimized readability.</p>
+              </div>
+              <button onclick="toggleTheme()" class="w-12 h-6 rounded-full bg-slate-200 dark:bg-violet-600 p-0.5 transition duration-300 relative focus:outline-none">
+                <span class="w-5 h-5 rounded-full bg-white shadow-md block transform translate-x-0 dark:translate-x-6 transition duration-300"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Account Actions summary -->
+          <div class="glass-card p-6 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 flex flex-col gap-4">
+            <h3 class="text-sm font-extrabold text-slate-400 uppercase tracking-wider">Account Information</h3>
+            
+            <div class="flex flex-col gap-3 text-xs">
+              <div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-850">
+                <span class="text-slate-400">Registered Name:</span>
+                <span id="settings-name" class="font-semibold">Loading...</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-850">
+                <span class="text-slate-400">Email Login:</span>
+                <span id="settings-email" class="font-semibold">Loading...</span>
+              </div>
+              <div class="flex justify-between items-center py-2">
+                <span class="text-slate-400">User Role:</span>
+                <span id="settings-role" class="font-semibold uppercase tracking-wider text-indigo-600 dark:text-violet-400">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container" class="mt-auto"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    function pageInit() {
+      if (currentUser) {
+        document.getElementById("settings-name").innerText = currentUser.name;
+        document.getElementById("settings-email").innerText = currentUser.email;
+        document.getElementById("settings-role").innerText = currentUser.role;
+      }
+    }
+  </script>
+</body>
+</html>

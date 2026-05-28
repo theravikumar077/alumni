@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div class="flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-black">Upcoming Events</h1>
+          <p class="text-xs text-slate-400 mt-1">Join webinars, workshops, galas, and networking dinners with alumni experts.</p>
+        </div>
+        
+        <!-- Add Event Button (Visible to Alumni, Mentor, Admin) -->
+        <button id="add-event-btn" onclick="openEventModal()" class="px-5 py-3 text-sm font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-2xl transition shadow-md hidden">
+          <i class="fa-solid fa-plus mr-1.5"></i> Create Event
+        </button>
+      </div>
+
+      <!-- Events List Grid -->
+      <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Skeleton Loaders -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-20 flex flex-col items-center gap-4">
+        <span class="p-5 bg-indigo-50 dark:bg-slate-900 text-slate-400 rounded-full text-4xl"><i class="fa-solid fa-calendar-times"></i></span>
+        <h3 class="text-xl font-bold">No Events Found</h3>
+        <p class="text-xs text-slate-400 max-w-sm">Keep checking back or check your dashboard if you created a pending submission.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Event Modal -->
+  <div id="event-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm hidden">
+    <div class="max-w-md w-full rounded-3xl glass p-6 border border-slate-200/50 dark:border-slate-800/80 shadow-2xl relative animate-float">
+      <!-- Close button -->
+      <button onclick="closeEventModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="text-xl font-extrabold mb-4 text-slate-800 dark:text-slate-100 flex items-center gap-2">
+        <i class="fa-regular fa-calendar-plus text-indigo-500"></i> Create New Event
+      </h3>
+
+      <form id="event-form" onsubmit="submitEvent(event)" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Event Title</label>
+          <input type="text" id="event-title" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="e.g. Resume Workshop">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Description</label>
+          <textarea id="event-desc" rows="3" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Provide event details, schedule, details..."></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Date</label>
+            <input type="date" id="event-date" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Time</label>
+            <input type="text" id="event-time" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="e.g. 5:00 PM - 7:00 PM">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Location / Meeting URL</label>
+          <input type="text" id="event-location" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="e.g. Zoom link or Science Center Hall B">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-450 uppercase mb-1.5">Image URL (Optional)</label>
+          <input type="text" id="event-image" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="e.g. https://images.unsplash.com/photo-...">
+        </div>
+
+        <button type="submit" class="w-full py-3.5 text-sm font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-xl transition duration-200 shadow-md">
+          Publish Event
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer id="footer-container" class="mt-auto"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    function pageInit() {
+      // Show/hide create event button based on role
+      if (currentUser && (currentUser.role === "alumni" || currentUser.role === "mentor" || currentUser.role === "admin")) {
+        const btn = document.getElementById("add-event-btn");
+        if (btn) btn.classList.remove("hidden");
+      }
+
+      // Set min date to today for scheduler
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('event-date').setAttribute('min', today);
+
+      fetchEvents();
+    }
+
+    async function fetchEvents() {
+      const grid = document.getElementById("events-grid");
+      const emptyState = document.getElementById("empty-state");
+
+      grid.innerHTML = createSkeleton(3);
+      emptyState.classList.add("hidden");
+
+      try {
+        const res = await fetch("/api/events");
+        const data = await res.json();
+
+        if (data.success && data.data.length > 0) {
+          grid.innerHTML = data.data.map(event => {
+            const hasRsvped = currentUser && event.rsvps.includes(currentUser.id);
+            const dateStr = new Date(event.date).toLocaleDateString(undefined, {
+              weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
+            });
+
+            return `
+              <div class="glass-card rounded-3xl border border-slate-200/40 dark:border-slate-800/40 overflow-hidden flex flex-col justify-between h-[28rem]">
+                <div>
+                  <div class="h-44 overflow-hidden relative">
+                    <img src="${event.image}" alt="Event Banner" class="w-full h-full object-cover">
+                    <div class="absolute top-4 right-4 px-3 py-1 text-[10px] font-extrabold uppercase bg-white/95 dark:bg-slate-900/95 text-indigo-600 dark:text-violet-400 rounded-lg shadow-md border border-slate-250/20">
+                      ${event.rsvps.length} RSVP'd
+                    </div>
+                  </div>
+
+                  <div class="p-6">
+                    <h3 class="font-extrabold text-lg text-slate-800 dark:text-slate-100 line-clamp-1">${event.title}</h3>
+                    
+                    <p class="text-xs text-indigo-600 dark:text-violet-400 font-semibold mt-1.5 flex items-center gap-1.5">
+                      <i class="fa-regular fa-calendar-days"></i> ${dateStr}
+                    </p>
+                    <p class="text-xs text-slate-400 font-semibold mt-1 flex items-center gap-1.5">
+                      <i class="fa-regular fa-clock"></i> ${event.time}
+                    </p>
+                    <p class="text-xs text-slate-400 font-semibold mt-1 flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-location-dot"></i> ${event.location}
+                    </p>
+
+                    <p class="text-xs text-slate-500 dark:text-slate-450 mt-3 line-clamp-2 leading-relaxed">
+                      ${event.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="px-6 pb-6 pt-3 border-t border-slate-100 dark:border-slate-850 flex items-center justify-between mt-auto">
+                  <div class="flex items-center gap-2">
+                    <img src="${event.organizer ? event.organizer.avatar : 'https://via.placeholder.com/32'}" alt="Organizer" class="w-7 h-7 rounded-full object-cover">
+                    <div class="min-w-0">
+                      <p class="text-[9px] font-bold text-slate-400 uppercase">Organized by</p>
+                      <p class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate max-w-[80px]">${event.organizer ? event.organizer.name : "AlumniHub"}</p>
+                    </div>
+                  </div>
+
+                  <div class="flex gap-2">
+                    ${currentUser && (event.organizer._id === currentUser.id || currentUser.role === "admin") ? `
+                      <button onclick="handleDeleteEvent('${event._id}')" class="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl transition">
+                        <i class="fa-regular fa-trash-can text-sm"></i>
+                      </button>
+                    ` : ""}
+                    <button onclick="handleRsvp('${event._id}')" class="px-4 py-2 text-xs font-semibold rounded-xl transition shadow-sm ${
+                      hasRsvped 
+                        ? "bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-350 hover:bg-slate-300" 
+                        : "bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 text-white"
+                    }">
+                      ${hasRsvped ? `<i class="fa-solid fa-check mr-1"></i> Going` : "RSVP"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+        } else {
+          grid.innerHTML = "";
+          emptyState.classList.remove("hidden");
+        }
+      } catch (err) {
+        console.error("Fetch events error:", err);
+        grid.innerHTML = "";
+        showToast("Error loading events feed", "error");
+      }
+    }
+
+    function openEventModal() {
+      if (!currentUser) return;
+      document.getElementById("event-modal").classList.remove("hidden");
+    }
+
+    function closeEventModal() {
+      document.getElementById("event-modal").classList.add("hidden");
+      document.getElementById("event-form").reset();
+    }
+
+    async function submitEvent(e) {
+      e.preventDefault();
+
+      const title = document.getElementById("event-title").value;
+      const description = document.getElementById("event-desc").value;
+      const date = document.getElementById("event-date").value;
+      const time = document.getElementById("event-time").value;
+      const location = document.getElementById("event-location").value;
+      const image = document.getElementById("event-image").value;
+
+      try {
+        const res = await fetch("/api/events", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ title, description, date, time, location, image })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showToast(data.message, "success");
+          closeEventModal();
+          fetchEvents();
+        } else {
+          showToast(data.message || "Failed to submit event", "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+
+    async function handleRsvp(eventId) {
+      if (!currentUser) {
+        showToast("Please log in to RSVP for events", "warning");
+        return;
+      }
+      try {
+        const res = await fetch(`/api/events/rsvp/${eventId}`, {
+          method: "POST"
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showToast(data.message, "success");
+          fetchEvents();
+        } else {
+          showToast(data.message || "RSVP failed", "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+
+    async function handleDeleteEvent(eventId) {
+      if (!confirm("Are you sure you want to delete this event?")) return;
+
+      try {
+        const res = await fetch(`/api/events/${eventId}`, {
+          method: "DELETE"
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showToast(data.message, "success");
+          fetchEvents();
+        } else {
+          showToast(data.message || "Delete failed", "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+  </script>
+</body>
+</html>

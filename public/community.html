@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Discussions - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Main Forums Layout -->
+  <main class="flex-1 max-w-4xl mx-auto px-4 py-10 w-full">
+    <div class="flex flex-col gap-6">
+      <div>
+        <h1 class="text-3xl font-black">Community & Discussions</h1>
+        <p class="text-xs text-slate-400 mt-1">Read inspiring alumni success stories or post career questions to the forums.</p>
+      </div>
+
+      <!-- Post Creation Writer Card (Visible when logged in) -->
+      <div id="post-writer-card" class="glass p-6 rounded-3xl border border-slate-200/50 dark:border-slate-800/80 hidden">
+        <h3 class="font-extrabold text-sm text-slate-450 uppercase mb-3"><i class="fa-solid fa-pen-nib mr-1 text-indigo-500"></i> Share with the Community</h3>
+        <form id="post-form" onsubmit="submitPost(event)" class="flex flex-col gap-4">
+          <div>
+            <input type="text" id="post-title" class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Title (e.g. Tips on securing an engineering internship)...">
+          </div>
+          <div>
+            <textarea id="post-content" rows="3" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Write your post details or alumni story here..."></textarea>
+          </div>
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-bold text-slate-400 uppercase">Post Category:</label>
+              <select id="post-type" class="px-3 py-1.5 rounded-lg glass-input text-xs text-slate-800 dark:text-slate-200">
+                <option value="discussion">Discussion Thread</option>
+                <option value="story">Alumni Story</option>
+              </select>
+            </div>
+            <button type="submit" class="px-5 py-2.5 text-xs font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-xl transition shadow-sm">
+              Post Thread
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Posts Listing Stream -->
+      <div id="posts-stream" class="flex flex-col gap-6">
+        <!-- Skeleton loaders -->
+      </div>
+      
+      <!-- Empty state -->
+      <div id="empty-state" class="hidden text-center py-20 flex flex-col items-center gap-4">
+        <span class="p-5 bg-indigo-50 dark:bg-slate-900 text-slate-400 rounded-full text-4xl"><i class="fa-solid fa-comments"></i></span>
+        <h3 class="text-xl font-bold">No Threads Yet</h3>
+        <p class="text-xs text-slate-400">Be the first to share an alumni story or ask a question!</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container" class="mt-auto"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    function pageInit() {
+      if (currentUser) {
+        document.getElementById("post-writer-card").classList.remove("hidden");
+      }
+      fetchPosts();
+    }
+
+    async function fetchPosts() {
+      const stream = document.getElementById("posts-stream");
+      const emptyState = document.getElementById("empty-state");
+      
+      stream.innerHTML = createSkeleton(3);
+      emptyState.classList.add("hidden");
+
+      try {
+        const res = await fetch("/api/posts");
+        const data = await res.json();
+
+        if (data.success && data.data.length > 0) {
+          stream.innerHTML = data.data.map(post => {
+            if (!post.author) return "";
+
+            const hasLiked = currentUser && post.likes.includes(currentUser.id);
+            const dateStr = new Date(post.createdAt).toLocaleDateString(undefined, {
+              month: 'short', day: 'numeric', year: 'numeric'
+            });
+
+            // Comments list
+            const commentsHTML = post.comments.map(c => {
+              if (!c.author) return "";
+              return `
+                <div class="flex gap-3 p-3 bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/10 dark:border-slate-800/10 text-xs">
+                  <img src="${c.author.avatar}" alt="Commenter" class="w-6 h-6 rounded-full object-cover flex-shrink-0">
+                  <div class="min-w-0">
+                    <p class="font-extrabold text-slate-800 dark:text-slate-200">${c.author.name} <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider ml-1.5">${c.author.role}</span></p>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1">${c.content}</p>
+                  </div>
+                </div>
+              `;
+            }).join("");
+
+            // Badge type
+            const typeBadge = post.type === "story"
+              ? `<span class="px-2 py-0.5 rounded-lg text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 uppercase"><i class="fa-solid fa-book-open mr-1"></i> Alumni Story</span>`
+              : `<span class="px-2 py-0.5 rounded-lg text-[9px] font-extrabold bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 uppercase"><i class="fa-solid fa-comments mr-1"></i> Discussion</span>`;
+
+            return `
+              <div class="glass-card p-6 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 flex flex-col gap-4">
+                <!-- Header -->
+                <div class="flex items-center justify-between gap-4">
+                  <div class="flex items-center gap-3">
+                    <img src="${post.author.avatar}" alt="Author" class="w-10 h-10 rounded-full border border-indigo-200 object-cover flex-shrink-0">
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <h4 class="font-extrabold text-sm text-slate-800 dark:text-slate-100">${post.author.name}</h4>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">${post.author.role}</span>
+                      </div>
+                      <p class="text-[10px] text-slate-400">${dateStr}</p>
+                    </div>
+                  </div>
+                  ${typeBadge}
+                </div>
+
+                <!-- Content -->
+                <div class="flex flex-col gap-1.5">
+                  ${post.title ? `<h3 class="font-extrabold text-base text-slate-800 dark:text-slate-100">${post.title}</h3>` : ""}
+                  <p class="text-sm text-slate-650 dark:text-slate-350 leading-relaxed whitespace-pre-wrap">${post.content}</p>
+                </div>
+
+                <!-- Actions Row -->
+                <div class="flex items-center gap-6 py-2 border-y border-slate-100 dark:border-slate-850/50 text-xs font-semibold">
+                  <button onclick="handleLike('${post._id}')" class="flex items-center gap-1.5 transition ${hasLiked ? 'text-indigo-600 dark:text-violet-400' : 'text-slate-400 hover:text-indigo-600 dark:hover:text-violet-400'}">
+                    <i class="${hasLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                    <span>${post.likes.length} Likes</span>
+                  </button>
+                  <button onclick="toggleCommentsSection('${post._id}')" class="flex items-center gap-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-violet-400 transition">
+                    <i class="fa-regular fa-comment"></i>
+                    <span>${post.comments.length} Comments</span>
+                  </button>
+                </div>
+
+                <!-- Comments Module -->
+                <div id="comments-section-${post._id}" class="hidden flex flex-col gap-3">
+                  <div class="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1">
+                    ${commentsHTML || `<p class="text-[11px] text-slate-400 italic">No comments yet. Write a response below!</p>`}
+                  </div>
+                  
+                  ${currentUser ? `
+                    <form onsubmit="submitComment(event, '${post._id}')" class="flex gap-2 items-center mt-1">
+                      <input type="text" id="comment-input-${post._id}" required class="flex-1 px-3 py-2 rounded-xl glass-input text-xs" placeholder="Add a comment...">
+                      <button type="submit" class="px-4 py-2 bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 rounded-xl text-xs font-semibold hover:bg-indigo-100">
+                        Send
+                      </button>
+                    </form>
+                  ` : ""}
+                </div>
+              </div>
+            `;
+          }).join("");
+        } else {
+          stream.innerHTML = "";
+          emptyState.classList.remove("hidden");
+        }
+      } catch (err) {
+        console.error("Fetch posts error:", err);
+        stream.innerHTML = "";
+        showToast("Error loading discussions feed", "error");
+      }
+    }
+
+    async function submitPost(e) {
+      e.preventDefault();
+
+      const title = document.getElementById("post-title").value;
+      const content = document.getElementById("post-content").value;
+      const type = document.getElementById("post-type").value;
+
+      try {
+        const res = await fetch("/api/posts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ title, content, type })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showToast(data.message, "success");
+          document.getElementById("post-form").reset();
+          fetchPosts();
+        } else {
+          showToast(data.message || "Failed to publish post", "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+
+    function toggleCommentsSection(postId) {
+      const section = document.getElementById(`comments-section-${postId}`);
+      if (section) {
+        section.classList.toggle("hidden");
+      }
+    }
+
+    async function handleLike(postId) {
+      if (!currentUser) {
+        showToast("Please log in to like posts", "warning");
+        return;
+      }
+      try {
+        const res = await fetch(`/api/posts/${postId}/like`, {
+          method: "POST"
+        });
+        const data = await res.json();
+        if (data.success) {
+          fetchPosts(); // refresh like counts
+        }
+      } catch (err) {
+        console.error("Like toggle error:", err);
+      }
+    }
+
+    async function submitComment(e, postId) {
+      e.preventDefault();
+
+      const input = document.getElementById(`comment-input-${postId}`);
+      const content = input.value;
+
+      try {
+        const res = await fetch(`/api/posts/${postId}/comment`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ content })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          input.value = "";
+          showToast(data.message, "success");
+          fetchPosts();
+        } else {
+          showToast(data.message || "Failed to submit comment", "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+  </script>
+</body>
+</html>

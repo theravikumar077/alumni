@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Page Body -->
+  <main class="flex-1 py-16 flex items-center justify-center relative overflow-hidden">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
+
+    <div class="max-w-4xl w-full mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch relative z-10">
+      <!-- Info Column -->
+      <div class="md:col-span-5 p-8 rounded-3xl glass text-white bg-indigo-600 dark:bg-violet-950/60 border border-indigo-400/30 flex flex-col justify-between gap-8">
+        <div class="flex flex-col gap-4">
+          <h2 class="text-2xl font-black">Get in Touch</h2>
+          <p class="text-sm text-indigo-100 dark:text-slate-350 leading-relaxed">
+            Have questions about authentication, becoming a mentor, posting job opportunities, or other features? Reach out directly.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-5">
+          <div class="flex items-center gap-3.5">
+            <span class="p-2.5 bg-white/10 rounded-xl text-lg"><i class="fa-solid fa-envelope"></i></span>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-indigo-200">Email Address</p>
+              <p class="text-sm font-semibold text-white">support@alumnihub.com</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3.5">
+            <span class="p-2.5 bg-white/10 rounded-xl text-lg"><i class="fa-solid fa-location-dot"></i></span>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-indigo-200">Campus Location</p>
+              <p class="text-sm font-semibold text-white">Tech Park Hall, Suite 101</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-xs text-indigo-200 dark:text-slate-400">&copy; AlumniHub Support System</p>
+      </div>
+
+      <!-- Form Column -->
+      <div class="md:col-span-7 p-8 rounded-3xl glass-card border border-slate-200/50 dark:border-slate-800/80">
+        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Send us a Message</h3>
+        
+        <form id="contact-form" onsubmit="submitContact(event)" class="flex flex-col gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Your Name</label>
+            <input type="text" id="contact-name" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="John Doe">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Email Address</label>
+            <input type="email" id="contact-email" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="john@example.com">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Message Inquiry</label>
+            <textarea id="contact-message" rows="4" required class="w-full px-4 py-3 rounded-xl glass-input text-sm text-slate-800 dark:text-slate-200" placeholder="Type your question here..."></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 text-sm font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-xl transition duration-200 shadow-md">
+            Send Inquiry
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    function submitContact(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById("contact-name").value;
+      const email = document.getElementById("contact-email").value;
+      const message = document.getElementById("contact-message").value;
+
+      showToast(`Inquiry sent successfully, ${name}! We will reply to ${email} soon.`, "success");
+      document.getElementById("contact-form").reset();
+    }
+  </script>
+</body>
+</html>

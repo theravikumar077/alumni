@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Page Header -->
+  <section class="py-16 text-center relative overflow-hidden bg-slate-50/50 dark:bg-slate-900/30">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.08),transparent)]"></div>
+    <div class="max-w-4xl mx-auto px-4 relative z-10 flex flex-col gap-4">
+      <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-violet-400">Our Story</span>
+      <h1 class="text-3xl sm:text-5xl font-black">About AlumniHub</h1>
+      <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-sm sm:text-base">
+        A premium networking ecosystem built to bridge the gap between academic education and industry experience.
+      </p>
+    </div>
+  </section>
+
+  <!-- Mission & Vision -->
+  <section class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div class="flex flex-col gap-6">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100">Connecting Generations</h2>
+        <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed">
+          AlumniHub was founded with a single mission: to create a powerful, self-sustaining community where former graduates and current students support each other. We believe that networking shouldn't be transactional. It should be mentorship-led, collaborative, and built on trust.
+        </p>
+        <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed">
+          Through our platform, student users can connect with alumni working at global companies, receive resume feedback, book 1-on-1 mentoring slots, and browse job postings curated directly by verified graduates.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="p-6 glass-card rounded-3xl flex flex-col gap-3">
+          <i class="fa-solid fa-graduation-cap text-2xl text-indigo-500"></i>
+          <h3 class="font-bold text-slate-800 dark:text-slate-100">Mentor Guidance</h3>
+          <p class="text-xs text-slate-400">Schedule one-on-one sessions with approved professionals.</p>
+        </div>
+        <div class="p-6 glass-card rounded-3xl flex flex-col gap-3">
+          <i class="fa-solid fa-briefcase text-2xl text-indigo-500"></i>
+          <h3 class="font-bold text-slate-800 dark:text-slate-100">Career Growth</h3>
+          <p class="text-xs text-slate-400">Access targeted jobs and internship postings.</p>
+        </div>
+        <div class="p-6 glass-card rounded-3xl flex flex-col gap-3">
+          <i class="fa-solid fa-comments text-2xl text-indigo-500"></i>
+          <h3 class="font-bold text-slate-800 dark:text-slate-100">Discussions</h3>
+          <p class="text-xs text-slate-400">Join threads on careers, design, devops, and science.</p>
+        </div>
+        <div class="p-6 glass-card rounded-3xl flex flex-col gap-3">
+          <i class="fa-solid fa-lock text-2xl text-indigo-500"></i>
+          <h3 class="font-bold text-slate-800 dark:text-slate-100">Admin Audits</h3>
+          <p class="text-xs text-slate-400">Every mentor profile is checked and approved manually.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process / How it works -->
+  <section class="py-16 bg-slate-50/50 dark:bg-slate-900/30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-center mb-12">How AlumniHub Works</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="flex flex-col items-center text-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-200 dark:shadow-none">1</div>
+          <h3 class="font-bold text-lg">Create a Profile</h3>
+          <p class="text-xs sm:text-sm text-slate-400 max-w-xs">Sign up as a Student or Alumni. Fill in your degree details, tags, and bio.</p>
+        </div>
+        <div class="flex flex-col items-center text-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-200 dark:shadow-none">2</div>
+          <h3 class="font-bold text-lg">Explore & Engage</h3>
+          <p class="text-xs sm:text-sm text-slate-400 max-w-xs">Browse directory lists, read posts, RSVP for meetups, or apply for career openings.</p>
+        </div>
+        <div class="flex flex-col items-center text-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-200 dark:shadow-none">3</div>
+          <h3 class="font-bold text-lg">Succeed Together</h3>
+          <p class="text-xs sm:text-sm text-slate-400 max-w-xs">Gain mentorship slots, secure career pathways, and grow your personal brand network.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer-container" class="mt-auto"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+</body>
+</html>

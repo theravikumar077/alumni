@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Dashboard content -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div class="flex flex-col gap-8">
+      <!-- Welcome Panel -->
+      <div class="glass p-6 sm:p-8 rounded-3xl border border-slate-200/50 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-4 text-left">
+          <img id="dash-avatar" src="https://via.placeholder.com/64" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-indigo-500 object-cover shadow-sm">
+          <div>
+            <h1 class="text-2xl font-black" id="dash-welcome">Welcome, Student</h1>
+            <p class="text-xs text-slate-400 mt-0.5">Explore events, careers, and book technical mentorship hours.</p>
+          </div>
+        </div>
+        
+        <div class="flex gap-3">
+          <a href="/mentors" class="px-5 py-3 text-xs font-semibold text-white bg-indigo-600 dark:bg-violet-600 hover:bg-indigo-700 dark:hover:bg-violet-700 rounded-2xl transition shadow-md">
+            Find Mentors
+          </a>
+        </div>
+      </div>
+
+      <!-- Dashboard Sections Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Mentorship Sessions Log (Left Column) -->
+        <section class="lg:col-span-6 flex flex-col gap-4">
+          <h2 class="text-xl font-extrabold flex items-center gap-2"><i class="fa-regular fa-calendar-check text-indigo-500"></i> Mentorship Sessions</h2>
+          
+          <div class="glass-card p-6 rounded-3xl flex flex-col gap-4 min-h-[300px]">
+            <div id="sessions-list" class="flex flex-col gap-3">
+              <!-- Loading Skeleton -->
+              <div class="skeleton h-16 rounded-xl"></div>
+            </div>
+            
+            <div id="sessions-empty" class="hidden text-center py-10 flex flex-col items-center gap-3">
+              <span class="text-3xl text-slate-450"><i class="fa-regular fa-calendar-minus"></i></span>
+              <p class="text-xs text-slate-400">No mentoring requests. Find a mentor to get started.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Events & Careers Status (Right Column) -->
+        <section class="lg:col-span-6 flex flex-col gap-6">
+          <!-- RSVP Events -->
+          <div class="flex flex-col gap-4">
+            <h2 class="text-xl font-extrabold flex items-center gap-2"><i class="fa-regular fa-star text-indigo-500"></i> RSVP'd Events</h2>
+            <div class="glass-card p-6 rounded-3xl min-h-[160px] flex flex-col justify-center">
+              <div id="rsvp-events-list" class="flex flex-col gap-3">
+                <div class="skeleton h-12 rounded-xl"></div>
+              </div>
+              <div id="rsvp-empty" class="hidden text-center py-4 text-xs text-slate-405">
+                No event RSVPs yet. Check the Events tab!
+              </div>
+            </div>
+          </div>
+
+          <!-- Applied Jobs -->
+          <div class="flex flex-col gap-4">
+            <h2 class="text-xl font-extrabold flex items-center gap-2"><i class="fa-solid fa-briefcase text-indigo-500"></i> Applied Career Openings</h2>
+            <div class="glass-card p-6 rounded-3xl min-h-[160px] flex flex-col justify-center">
+              <div id="applied-jobs-list" class="flex flex-col gap-3">
+                <div class="skeleton h-12 rounded-xl"></div>
+              </div>
+              <div id="jobs-empty" class="hidden text-center py-4 text-xs text-slate-405">
+                No job applications submitted yet. Browse the Jobs tab!
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container" class="mt-auto"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    function pageInit() {
+      // Guard role
+      if (currentUser.role !== "user") {
+        redirectToDashboard();
+        return;
+      }
+
+      document.getElementById("dash-welcome").innerText = `Welcome, ${currentUser.name}`;
+      document.getElementById("dash-avatar").src = currentUser.avatar;
+
+      fetchStudentSessions();
+      fetchStudentActivities();
+    }
+
+    async function fetchStudentSessions() {
+      const container = document.getElementById("sessions-list");
+      const empty = document.getElementById("sessions-empty");
+
+      try {
+        const res = await fetch("/api/mentors/sessions");
+        const data = await res.json();
+
+        if (data.success && data.sessions.length > 0) {
+          empty.classList.add("hidden");
+          container.innerHTML = data.sessions.map(s => {
+            let statusColor = "";
+            if (s.status === "accepted") statusColor = "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
+            else if (s.status === "rejected") statusColor = "bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 border-rose-500/20";
+            else statusColor = "bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border-amber-500/20";
+
+            return `
+              <div class="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-150/40 dark:border-slate-800 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <img src="${s.mentorAvatar || 'https://via.placeholder.com/36'}" alt="Mentor" class="w-10 h-10 rounded-full object-cover">
+                  <div>
+                    <h4 class="font-bold text-xs text-slate-800 dark:text-slate-100">${s.mentorName}</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5"><span class="font-semibold text-slate-500">Topic:</span> ${s.topic}</p>
+                    <p class="text-[10px] text-indigo-650 dark:text-violet-400 font-semibold mt-0.5"><i class="fa-regular fa-clock mr-1"></i> ${new Date(s.date).toLocaleDateString()} &bull; ${s.time}</p>
+                  </div>
+                </div>
+
+                <span class="px-2.5 py-1 text-[10px] font-extrabold uppercase border rounded-lg ${statusColor}">
+                  ${s.status}
+                </span>
+              </div>
+            `;
+          }).join("");
+        } else {
+          container.innerHTML = "";
+          empty.classList.remove("hidden");
+        }
+      } catch (err) {
+        console.error("Student sessions fetch error:", err);
+      }
+    }
+
+    async function fetchStudentActivities() {
+      const eventContainer = document.getElementById("rsvp-events-list");
+      const eventEmpty = document.getElementById("rsvp-empty");
+      const jobContainer = document.getElementById("applied-jobs-list");
+      const jobEmpty = document.getElementById("jobs-empty");
+
+      try {
+        // Fetch events rsvp
+        const evRes = await fetch("/api/events");
+        const evData = await evRes.json();
+        if (evData.success) {
+          const myRsvps = evData.data.filter(e => e.rsvps.includes(currentUser.id || currentUser._id));
+          if (myRsvps.length > 0) {
+            eventEmpty.classList.add("hidden");
+            eventContainer.innerHTML = myRsvps.map(e => `
+              <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-150/40 dark:border-slate-800 text-xs">
+                <div>
+                  <h4 class="font-bold text-slate-800 dark:text-slate-100">${e.title}</h4>
+                  <p class="text-[10px] text-slate-450 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i> ${new Date(e.date).toLocaleDateString()} &bull; ${e.time}</p>
+                </div>
+                <a href="/events" class="text-[10px] font-bold text-indigo-650 dark:text-violet-400 hover:underline">View details</a>
+              </div>
+            `).join("");
+          } else {
+            eventContainer.innerHTML = "";
+            eventEmpty.classList.remove("hidden");
+          }
+        }
+
+        // Fetch jobs applied
+        const jobRes = await fetch("/api/jobs");
+        const jobData = await jobRes.json();
+        if (jobData.success) {
+          const myApps = jobData.data.filter(j => j.applicants.includes(currentUser.id || currentUser._id));
+          if (myApps.length > 0) {
+            jobEmpty.classList.add("hidden");
+            jobContainer.innerHTML = myApps.map(j => `
+              <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-150/40 dark:border-slate-800 text-xs">
+                <div>
+                  <h4 class="font-bold text-slate-800 dark:text-slate-100">${j.title}</h4>
+                  <p class="text-[10px] text-indigo-650 dark:text-violet-400 font-bold mt-0.5">${j.company} &bull; ${j.location}</p>
+                </div>
+                <span class="px-2 py-0.5 bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 rounded-lg text-[9px] font-extrabold uppercase">Submitted</span>
+              </div>
+            `).join("");
+          } else {
+            jobContainer.innerHTML = "";
+            jobEmpty.classList.remove("hidden");
+          }
+        }
+      } catch (err) {
+        console.error("Activities fetch error:", err);
+      }
+    }
+  </script>
+</body>
+</html>

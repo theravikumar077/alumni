@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - AlumniHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- ChartJS CDN for premium analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Sticky Navbar -->
+  <header id="navbar-container"></header>
+
+  <!-- Main Dashboard Pane -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div class="flex flex-col gap-8">
+      <div>
+        <h1 class="text-3xl font-black">Admin Management Suite</h1>
+        <p class="text-xs text-slate-400 mt-1">Audit platform accounts, verify alumni, evaluate postings, and review system-wide analytics.</p>
+      </div>
+
+      <!-- Metrics Deck -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="stats-deck">
+        <div class="skeleton h-24 rounded-2xl"></div>
+        <div class="skeleton h-24 rounded-2xl"></div>
+        <div class="skeleton h-24 rounded-2xl"></div>
+        <div class="skeleton h-24 rounded-2xl"></div>
+      </div>
+
+      <!-- Chart & Approvals Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Analytics Chart -->
+        <div class="lg:col-span-5 glass-card p-6 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 flex flex-col justify-between">
+          <h3 class="font-extrabold text-sm text-slate-400 uppercase tracking-wider mb-4"><i class="fa-solid fa-chart-pie mr-1 text-indigo-500"></i> User Distribution</h3>
+          <div class="w-full aspect-square flex items-center justify-center p-2">
+            <canvas id="rolesChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Pending approvals module -->
+        <div class="lg:col-span-7 flex flex-col gap-4">
+          <h2 class="text-xl font-extrabold flex items-center gap-2"><i class="fa-regular fa-bell text-indigo-500"></i> Pending Approvals Queue</h2>
+          
+          <div class="glass-card p-6 rounded-3xl min-h-[300px] flex flex-col justify-between">
+            <div id="pending-list" class="flex flex-col gap-3">
+              <div class="skeleton h-16 rounded-xl"></div>
+              <div class="skeleton h-16 rounded-xl"></div>
+            </div>
+            
+            <div id="pending-empty" class="hidden text-center py-20 flex flex-col items-center gap-3">
+              <span class="text-3xl text-emerald-500"><i class="fa-solid fa-circle-check"></i></span>
+              <p class="text-xs text-slate-400">Perfect! No pending mentor requests, jobs, or events require approvals.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users management table list -->
+      <section class="flex flex-col gap-4">
+        <h2 class="text-xl font-extrabold flex items-center gap-2"><i class="fa-solid fa-users-cog text-indigo-500"></i> User Directory Management</h2>
+        
+        <div class="glass-card rounded-3xl border border-slate-200/40 dark:border-slate-800/40 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-100/50 dark:bg-slate-900/50 text-slate-400 uppercase font-bold border-b border-slate-200/40 dark:border-slate-800">
+                  <th class="p-4">User profile</th>
+                  <th class="p-4">Role</th>
+                  <th class="p-4">Verification</th>
+                  <th class="p-4">Register date</th>
+                  <th class="p-4 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <tr>
+                  <td colspan="5" class="p-8 text-center"><div class="skeleton h-12 rounded-xl"></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container" class="mt-auto"></footer>
+
+  <!-- App Main Scripts -->
+  <script src="/js/app.js"></script>
+
+  <script>
+    let rolesChartInstance = null;
+
+    function pageInit() {
+      // Guard role
+      if (currentUser.role !== "admin") {
+        redirectToDashboard();
+        return;
+      }
+
+      fetchAdminStats();
+      fetchPendingApprovals();
+      fetchUsersList();
+    }
+
+    async function fetchAdminStats() {
+      try {
+        const res = await fetch("/api/admin/stats");
+        const data = await res.json();
+
+        if (data.success) {
+          const stats = data.stats;
+          
+          document.getElementById("stats-deck").innerHTML = `
+            <div class="p-5 glass-card rounded-2xl border border-slate-200/40 dark:border-slate-800 flex items-center justify-between gap-4">
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase">Total Accounts</p>
+                <p class="text-2xl font-black text-indigo-600 dark:text-violet-400 mt-1">${stats.totalUsers}</p>
+              </div>
+              <span class="p-3 bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 rounded-xl text-lg"><i class="fa-solid fa-users"></i></span>
+            </div>
+
+            <div class="p-5 glass-card rounded-2xl border border-slate-200/40 dark:border-slate-800 flex items-center justify-between gap-4">
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase">Alumni Directory</p>
+                <p class="text-2xl font-black text-indigo-600 dark:text-violet-400 mt-1">${stats.totalAlumni}</p>
+              </div>
+              <span class="p-3 bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 rounded-xl text-lg"><i class="fa-solid fa-graduation-cap"></i></span>
+            </div>
+
+            <div class="p-5 glass-card rounded-2xl border border-slate-200/40 dark:border-slate-800 flex items-center justify-between gap-4">
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase">Approved Mentors</p>
+                <p class="text-2xl font-black text-indigo-600 dark:text-violet-400 mt-1">${stats.totalMentors}</p>
+              </div>
+              <span class="p-3 bg-indigo-50 dark:bg-violet-950/40 text-indigo-600 dark:text-violet-400 rounded-xl text-lg"><i class="fa-solid fa-chalkboard-user"></i></span>
+            </div>
+
+            <div class="p-5 glass-card rounded-2xl border border-slate-200/40 dark:border-slate-800 flex items-center justify-between gap-4">
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase">Pending Audits</p>
+                <p class="text-2xl font-black text-rose-500 mt-1">${stats.pendingMentors + stats.pendingEvents + stats.pendingJobs}</p>
+              </div>
+              <span class="p-3 bg-rose-50 dark:bg-rose-950/30 text-rose-600 rounded-xl text-lg"><i class="fa-solid fa-hourglass-half"></i></span>
+            </div>
+          `;
+
+          // Draw ChartJS Roles distribution
+          const alumniCount = stats.totalAlumni - stats.totalMentors;
+          const mentorsCount = stats.totalMentors;
+          const studentsCount = stats.totalUsers - stats.totalAlumni - 1; // subtract 1 admin
+          
+          drawChart(studentsCount, alumniCount, mentorsCount);
+        }
+      } catch (err) {
+        console.error("Admin stats fetch error:", err);
+      }
+    }
+
+    function drawChart(students, alumni, mentors) {
+      const ctx = document.getElementById('rolesChart').getContext('2d');
+      
+      if (rolesChartInstance) {
+        rolesChartInstance.destroy();
+      }
+
+      rolesChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Students', 'Alumni Only', 'Mentors'],
+          datasets: [{
+            data: [students, alumni, mentors],
+            backgroundColor: ['#6366f1', '#a855f7', '#10b981'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: document.documentElement.classList.contains('dark') ? '#cbd5e1' : '#475569',
+                font: { size: 11, weight: 'bold' }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    async function fetchPendingApprovals() {
+      const container = document.getElementById("pending-list");
+      const empty = document.getElementById("pending-empty");
+
+      try {
+        const res = await fetch("/api/admin/pending");
+        const data = await res.json();
+
+        if (data.success) {
+          const { mentors, events, jobs } = data.data;
+
+          let htmlParts = [];
+
+          // Mentors pending
+          mentors.forEach(m => {
+            htmlParts.push(`
+              <div class="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-150/40 dark:border-slate-800 flex items-center justify-between gap-4 text-xs">
+                <div class="flex items-center gap-3">
+                  <span class="p-2 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-sm"><i class="fa-solid fa-chalkboard-user"></i></span>
+                  <div>
+                    <p class="font-bold text-slate-800 dark:text-slate-100">Mentor Application: ${m.userId.name}</p>
+                    <p class="text-[9px] text-slate-400 font-semibold">Expertise: ${m.expertise.join(", ")}</p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="respondMentor('${m._id}', false)" class="px-2.5 py-1 text-[10px] bg-rose-50 text-rose-500 font-bold rounded-lg">Reject</button>
+                  <button onclick="respondMentor('${m._id}', true)" class="px-2.5 py-1 text-[10px] bg-emerald-600 text-white font-bold rounded-lg">Approve</button>
+                </div>
+              </div>
+            `);
+          });
+
+          // Events pending
+          events.forEach(e => {
+            htmlParts.push(`
+              <div class="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-150/40 dark:border-slate-800 flex items-center justify-between gap-4 text-xs">
+                <div class="flex items-center gap-3">
+                  <span class="p-2 bg-indigo-50 dark:bg-violet-950/40 text-indigo-650 dark:text-violet-400 rounded-xl text-sm"><i class="fa-regular fa-calendar"></i></span>
+                  <div>
+                    <p class="font-bold text-slate-800 dark:text-slate-100">Event Audit: "${e.title}"</p>
+                    <p class="text-[9px] text-slate-400 font-semibold">By: ${e.organizer ? e.organizer.name : "AlumniHub"}</p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="respondEvent('${e._id}', false)" class="px-2.5 py-1 text-[10px] bg-rose-50 text-rose-500 font-bold rounded-lg">Remove</button>
+                  <button onclick="respondEvent('${e._id}', true)" class="px-2.5 py-1 text-[10px] bg-indigo-600 text-white font-bold rounded-lg">Approve</button>
+                </div>
+              </div>
+            `);
+          });
+
+          // Jobs pending
+          jobs.forEach(j => {
+            htmlParts.push(`
+              <div class="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-150/40 dark:border-slate-800 flex items-center justify-between gap-4 text-xs">
+                <div class="flex items-center gap-3">
+                  <span class="p-2 bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 rounded-xl text-sm"><i class="fa-solid fa-briefcase"></i></span>
+                  <div>
+                    <p class="font-bold text-slate-800 dark:text-slate-100">Job Audit: "${j.title}" at ${j.company}</p>
+                    <p class="text-[9px] text-slate-400 font-semibold">Posted By: ${j.postedBy ? j.postedBy.name : "Alumni"}</p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="respondJob('${j._id}', false)" class="px-2.5 py-1 text-[10px] bg-rose-50 text-rose-500 font-bold rounded-lg">Remove</button>
+                  <button onclick="respondJob('${j._id}', true)" class="px-2.5 py-1 text-[10px] bg-indigo-600 text-white font-bold rounded-lg">Approve</button>
+                </div>
+              </div>
+            `);
+          });
+
+          if (htmlParts.length > 0) {
+            empty.classList.add("hidden");
+            container.innerHTML = htmlParts.join("");
+          } else {
+            container.innerHTML = "";
+            empty.classList.remove("hidden");
+          }
+        }
+      } catch (err) {
+        console.error("Fetch pending error:", err);
+      }
+    }
+
+    async function fetchUsersList() {
+      const tbody = document.getElementById("users-table-body");
+
+      try {
+        const res = await fetch("/api/admin/users");
+        const data = await res.json();
+
+        if (data.success && data.data.length > 0) {
+          tbody.innerHTML = data.data.map(u => {
+            const dateStr = new Date(u.createdAt).toLocaleDateString();
+            const isMe = u._id === currentUser.id || u._id === currentUser._id;
+            
+            return `
+              <tr class="border-b border-slate-100 dark:border-slate-850 hover:bg-slate-50/30 dark:hover:bg-slate-900/10">
+                <td class="p-4 flex items-center gap-3">
+                  <img src="${u.avatar}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                  <div>
+                    <p class="font-bold text-slate-800 dark:text-slate-100">${u.name}</p>
+                    <p class="text-[10px] text-slate-400">${u.email}</p>
+                  </div>
+                </td>
+                <td class="p-4 font-semibold uppercase tracking-wider text-[10px] text-slate-500">${u.role}</td>
+                <td class="p-4">
+                  <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" onchange="toggleUserVerify('${u._id}', this.checked)" ${u.isVerified ? 'checked' : ''} ${isMe ? 'disabled' : ''} class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-350">
+                    <span class="text-[10px] font-semibold text-slate-500">${u.isVerified ? 'Verified' : 'Unverified'}</span>
+                  </label>
+                </td>
+                <td class="p-4 text-slate-450">${dateStr}</td>
+                <td class="p-4 text-center">
+                  ${isMe 
+                    ? `<span class="text-[10px] text-slate-400 font-semibold italic">Admin account</span>`
+                    : `<button onclick="deleteUserAccount('${u._id}', '${u.name}')" class="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl transition">
+                        <i class="fa-regular fa-trash-can text-sm"></i>
+                       </button>`
+                  }
+                </td>
+              </tr>
+            `;
+          }).join("");
+        }
+      } catch (err) {
+        console.error("Fetch users error:", err);
+      }
+    }
+
+    async function toggleUserVerify(userId, checked) {
+      try {
+        const res = await fetch(`/api/admin/users/${userId}/verify`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ verified: checked })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, "success");
+          fetchUsersList();
+          fetchAdminStats();
+        }
+      } catch (err) {
+        showToast("Error updating verification", "error");
+      }
+    }
+
+    async function deleteUserAccount(userId, name) {
+      if (!confirm(`WARNING: Are you sure you want to delete ${name}? This will delete their profile and ALL associated jobs, events, and records.`)) return;
+
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+          method: "DELETE"
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showToast(data.message, "success");
+          fetchUsersList();
+          fetchAdminStats();
+          fetchPendingApprovals();
+        } else {
+          showToast(data.message || "Failed to delete user", "error");
+        }
+      } catch (err) {
+        showToast("Server connection error", "error");
+      }
+    }
+
+    async function respondMentor(mentorId, approve) {
+      try {
+        const res = await fetch(`/api/admin/mentors/${mentorId}/approve`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ status: approve })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, "success");
+          fetchPendingApprovals();
+          fetchAdminStats();
+          fetchUsersList();
+        }
+      } catch (err) {
+        showToast("Error response", "error");
+      }
+    }
+
+    async function respondEvent(eventId, approve) {
+      try {
+        const res = await fetch(`/api/admin/events/${eventId}/approve`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ approved: approve })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, "success");
+          fetchPendingApprovals();
+          fetchAdminStats();
+        }
+      } catch (err) {
+        showToast("Error response", "error");
+      }
+    }
+
+    async function respondJob(jobId, approve) {
+      try {
+        const res = await fetch(`/api/admin/jobs/${jobId}/approve`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ approved: approve })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, "success");
+          fetchPendingApprovals();
+          fetchAdminStats();
+        }
+      } catch (err) {
+        showToast("Error response", "error");
+      }
+    }
+
+    // Monitor theme changes to update ChartJS styling
+    document.addEventListener("themeChanged", () => {
+      fetchAdminStats();
+    });
+  </script>
+</body>
+</html>
