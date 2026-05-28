@@ -8,7 +8,7 @@ Designed to help alumni, students, mentors, and admins connect in one beautiful 
 # 🚀 Live Preview
 
 🔗 Live Website:  
-https://alumnihub071.netlify.app/index1.html
+https://alumnihub-sigma.vercel.app
 
 ---
 
